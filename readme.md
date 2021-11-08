@@ -2,14 +2,14 @@ about the dataset:
 
 1.provide a directory with "ori_imgs" (whatever size bigger than 256*128 since we will only utilize the cropped one), the generate_data.py will 
 1) generate 4*6 images with size 256*128 under out_imgs,
-among which covering 4 transformation: blur illu scale rotation, each transfrom have 6 variation imges.
+among which covering 5 transformation: blur illu scale rotation proj, each transfrom have 6 variation imges.
 
 2) generate the cropped ori_imgs under final_ori_imgs.
 
 3) currently we have 98 imgs under "ori_imgs" as source.
 
-4) we didn't consider proj transform, since I am sure how to get the correct H mat for <cropped rectangle>. It is doable if we didn't do the cropping, under this case, the transform H we did for the bigger ori img is exacty the H_GT. This doesn't holds when consider local img, but can be computed if we crop the center rectangle under rot/scale transformtion.  <This can be tested with scipt "/home/jinjing/Projects/keypoints_comparision/testH.py">
-
+*4) we didn't consider proj transform, since I am sure how to get the correct H mat for <cropped rectangle>. It is doable if we didn't do the cropping, under this case, the transform H we did for the bigger ori img is exacty the H_GT. This doesn't holds when consider local img, but can be computed if we crop the center rectangle under rot/scale transformtion.  <This can be tested with scipt "/home/jinjing/Projects/keypoints_comparision/testH.py">
+5) now we do consider the proj transformation, by getting the GT_H in another manner: modelling camera model and the imgaing processing, meaning, 2D-3D converting. reference:https://stackoverflow.com/questions/6606891/opencv-virtually-camera-rotating-translating-for-birds-eye-view
 
 
 2.we consider 3 traditional methods: ORB, AGAST_SIFT, AKAZE      2 learning based methods: Superpoint KP2D
