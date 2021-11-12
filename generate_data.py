@@ -61,7 +61,7 @@ def create_rot_new(ori_img_paths,ori_img_dir,new_img_dir_general ):
         # new_img_dir = new_img_dir+"/"+img_path[:-4]+"/rot/"
         new_img_dir = Path(new_img_dir_general+"/"+img_path[:-4], f"rot/")
         new_img_dir.mkdir(parents = True, exist_ok = True)
-        new_img_dir_pair = Path(new_img_dir_general+"/"+img_path[:-4], f"rot_pair/")
+        # new_img_dir_pair = Path(new_img_dir_general+"/"+img_path[:-4], f"rot_pair/")
         # new_img_dir_pair.mkdir(parents = True, exist_ok = True)
 
         y,x = img.shape[:2]
@@ -85,7 +85,7 @@ def create_scale_new(ori_img_paths,ori_img_dir,new_img_dir_general ):
         # new_img_dir = new_img_dir+"/"+img_path[:-4]+"/scale/"
         new_img_dir = Path(new_img_dir_general+"/"+img_path[:-4], f"scale/")
         new_img_dir.mkdir(parents = True, exist_ok = True)
-        new_img_dir_pair = Path(new_img_dir_general+"/"+img_path[:-4], f"scale_pair/")
+        # new_img_dir_pair = Path(new_img_dir_general+"/"+img_path[:-4], f"scale_pair/")
         # new_img_dir_pair.mkdir(parents = True, exist_ok = True)
 
         y,x = img.shape[:2]
@@ -106,7 +106,7 @@ def create_illu_new(ori_img_paths,ori_img_dir,new_img_dir_general ):# gamma
         # new_img_dir = new_img_dir+"/"+img_path[:-4]+"/illu/"
         new_img_dir = Path(new_img_dir_general+"/"+img_path[:-4], f"illu/")
         new_img_dir.mkdir(parents = True, exist_ok = True)
-        new_img_dir_pair = Path(new_img_dir_general+"/"+img_path[:-4], f"illu_pair/")
+        # new_img_dir_pair = Path(new_img_dir_general+"/"+img_path[:-4], f"illu_pair/")
         # new_img_dir_pair.mkdir(parents = True, exist_ok = True)
 
         y,x = img.shape[:2]
@@ -130,7 +130,7 @@ def create_blur_new(ori_img_paths,ori_img_dir,new_img_dir_general ):
         # new_img_dir = new_img_dir+"/"+img_path[:-4]+"/blur/"
         new_img_dir = Path(new_img_dir_general+"/"+img_path[:-4], f"blur/")
         new_img_dir.mkdir(parents = True, exist_ok = True)
-        new_img_dir_pair = Path(new_img_dir_general+"/"+img_path[:-4], f"blur_pair/")
+        # new_img_dir_pair = Path(new_img_dir_general+"/"+img_path[:-4], f"blur_pair/")
         # new_img_dir_pair.mkdir(parents = True, exist_ok = True)
 
         y,x = img.shape[:2]
@@ -150,20 +150,116 @@ def create_proj_new(ori_img_paths,ori_img_dir,new_img_dir_general ):
         img = cv2.imread(ori_img_dir+"/"+img_path)
         new_img_dir = Path(new_img_dir_general+"/"+img_path[:-4], f"proj/")
         new_img_dir.mkdir(parents = True, exist_ok = True)
-        new_img_dir_pair = Path(new_img_dir_general+"/"+img_path[:-4], f"proj_pair/")
+        # new_img_dir_pair = Path(new_img_dir_general+"/"+img_path[:-4], f"proj_pair/")
         # new_img_dir_pair.mkdir(parents = True, exist_ok = True)
 
-        y,x = img.shape[:2]
+        # proj_list = [0.02,0.04,0.06,0.08,0.1]
+        # proj_list = [0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1]
+
         for param in proj_list:#
-            H = cv2.getRotationMatrix2D((x/2,y/2),0,1)
-            H = np.vstack((H,np.array(( 0.0001*param,0.0001*param,1))))
-            # small_rotate = cv2.getRotationMatrix2D((rec_w_half,rec_h_half),0,1)
-            GT_H_mat[str(param)] = H
-            img_proj = cv2.warpPerspective(img,H,(x,y))
-            cv2.imwrite(str(new_img_dir)+"/"+str(param)+".png", img_proj[int(y/2)-rec_h_half:int(y/2)+rec_h_half, int(x/2)-rec_w_half:int(x/2)+rec_w_half])#[y:y+h, x:x+w]
+
+            # there can be actual values for rotZdeg(2D rotate), f(scale),trans_X,trans_Y
+            h,w = img.shape[:2]  # row col
+            rotXdeg = param  # these two param better be smaller than 0.2, so as to get reasonable prospective
+            rotYdeg = param
+            rotZdeg = 0   # this will control 2D rotate
+            rotX = rotXdeg*np.pi/180
+            rotY = rotYdeg*np.pi/180
+            rotZ = rotZdeg*np.pi/180
+            dist = 1#  #trans_Z   # equal the [2][2] value of the final 3*3 H mat   # samller zoom inner, take the same effect as f?   #nothing 1  # better always keep fixed to 1
+            f = 1#1.2# bigger blurer  zoom inner  # when it equals 1, eactly the same, no scaling.   # nothing 1  # potential scaling factor
+            trans_X = 0#50
+            trans_Y = 0#25#50
+
+            #Projection 2D -> 3D matrix
+            A1= np.matrix([[1, 0, -w/2],
+                           [0, 1, -h/2],
+                           [0, 0, 0   ],
+                           [0, 0, 1   ]])
+
+            # Rotation matrices around the X,Y,Z axis
+            RX = np.matrix([[1,           0,            0, 0],
+                            [0,np.cos(rotX),-np.sin(rotX), 0],
+                            [0,np.sin(rotX),np.cos(rotX) , 0],
+                            [0,           0,            0, 1]])
+
+            RY = np.matrix([[ np.cos(rotY), 0, np.sin(rotY), 0],
+                            [            0, 1,            0, 0],
+                            [ -np.sin(rotY), 0, np.cos(rotY), 0],
+                            [            0, 0,            0, 1]])
+
+            RZ = np.matrix([[ np.cos(rotZ), -np.sin(rotZ), 0, 0],
+                            [ np.sin(rotZ), np.cos(rotZ), 0, 0],
+                            [            0,            0, 1, 0],
+                            [            0,            0, 0, 1]])
+
+            #Composed rotation matrix with (RX,RY,RZ)
+            R = RX * RY * RZ
+
+            #Translation matrix on the Z axis change dist will change the height
+            T = np.matrix([[1,0,0,trans_X],
+                           [0,1,0,trans_Y],
+                           [0,0,1,dist],
+                           [0,0,0,1]])
+
+            #Camera Intrisecs matrix 3D -> 2D
+            A2= np.matrix([[f, 0, w/2,0],
+                           [0, f, h/2,0],
+                           [0, 0, 1,0]])
+            # Final and overall transformation matrix
+            H_big = A2 * (T * (R * A1))
+
+            img_proj = cv2.warpPerspective(img,H_big,(w,h))
+            # cv2.imwrite(str(new_img_dir)+"/"+str(param)+".png", img_proj[int(y/2)-rec_h_half:int(y/2)+rec_h_half, int(x/2)-rec_w_half:int(x/2)+rec_w_half])#[y:y+h, x:x+w]
+
+            h_r = rec_h_half*2
+            w_r = rec_w_half*2
+            #Projection 2D -> 3D matrix
+            A1_r= np.matrix([[1, 0, -w_r/2],
+                           [0, 1, -h_r/2],
+                           [0, 0, 0   ],
+                           [0, 0, 1   ]])
+
+            #Camera Intrisecs matrix 3D -> 2D
+            A2_r= np.matrix([[f, 0, w_r/2,0],
+                           [0, f, h_r/2,0],
+                           [0, 0, 1,0]])
+            H_rect = A2_r * (T * (R * A1_r))
+            # GT_H_mat[str(param)] = H_rect
+
+            img_big = img.copy()
+            cv2.warpPerspective(img,H_big,(w,h),img_big,cv2.INTER_CUBIC)
+            # cv2.imshow("",np.concatenate((img,img_proj)))
+            # cv2.waitKey(0)
+            proj_big = img_big[int(h/2)-int(h_r/2):int(h/2)+int(h_r/2), int(w/2)-int(w_r/2):int(w/2)+int(w_r/2)]
+            img_big = img[int(h/2)-int(h_r/2):int(h/2)+int(h_r/2), int(w/2)-int(w_r/2):int(w/2)+int(w_r/2)]
+            proj_rect = img_big.copy()
+            cv2.warpPerspective(img_big,H_rect,(w_r,h_r),proj_rect,cv2.INTER_CUBIC)
+
+            # #the 5 imgs are:
+            # 1) the cropped rect based on the ori big img
+            # 2) the cropped rect based on the transformed big img wrt H_big
+            # 3) the transformed img based on the cropped rect img,i.e img1, wrt H_rect. Notice, H_rect is the H_GT
+            # 4) To prove the correctness of H_rect, we check if img2 and img3 perfect aligh by deduct img2 and img3,
+            # as see in the black region, their pixel values are exact the same, this means the way we construct H_GT is correct
+            # 5) for comparision, the img different of img1 and img2 shoudl be everywhere, which is the case
+
+            # cv2.imshow("",np.concatenate((img_big,proj_big,proj_rect,proj_rect-proj_big,proj_rect-img_big)))#   first two are the 2 small ones; later two are the cropped one based on the bigger img
+            # cv2.waitKey(0)
+            cv2.imwrite(str(new_img_dir)+"/"+str(param)+".png",proj_big)#[y:y+h, x:x+w]
+            GT_H_mat[str(param)] = H_rect#GT_H_mat[str(gamma)] = np.vstack((rotate,np.array((0,0,1))))
+
+
+
+
+
+
 
         GT_H_mat_path = Path(new_img_dir,f"GT_H_mat.npz")
         np.savez(GT_H_mat_path,**GT_H_mat)
+
+
+
 
 
 
@@ -342,7 +438,9 @@ if __name__=="__main__":
     scale_list = [0.7,0.8,0.9,1.1,1.2,1.3]  # zoom out
     blur_list = [2,3,4,5,6,7]
     illu_list = [0.4,0.6,0.8,1.2,1.4,1.6]
-    proj_list = [1,2,3,-1,-2,-3]
+    proj_list = [0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1]#[1,2,3,-1,-2,-3]
+    proj_list = [0.03,0.06,0.09,-0.03,-0.06,-0.09]#[1,2,3,-1,-2,-3]
+
     mix_list = [str(p_rot)+"_"+str(p_scale)+"_"+str(p_blur)+"_"+str(p_illu)+"_"+str(p_proj) for p_rot,p_scale,p_blur,p_illu,p_proj in zip(rot_list,scale_list,blur_list,illu_list,proj_list)]#str(p_rot)+"_"+str(p_scale)+"_"+str(p_illu)+"_"+str(p_blur)
     transform_params_list = [rot_list,scale_list,blur_list,illu_list,proj_list,mix_list]
     method_list = ["SuperPoint","ORB","AGAST_SIFT","GFTT_SIFT"]
@@ -354,7 +452,7 @@ if __name__=="__main__":
     create_scale_new(ori_img_paths,ori_img_dir,new_img_dir)
     create_illu_new(ori_img_paths,ori_img_dir,new_img_dir)
     create_blur_new(ori_img_paths,ori_img_dir,new_img_dir)
-    # create_proj_new(ori_img_paths,ori_img_dir,new_img_dir)
+    create_proj_new(ori_img_paths,ori_img_dir,new_img_dir)
     # create_mix_new(ori_img_paths,ori_img_dir,new_img_dir)
 
     create_final_ori(ori_img_paths,ori_img_dir,final_ori_img_dir)
