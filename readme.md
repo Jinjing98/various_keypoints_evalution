@@ -38,9 +38,17 @@ some notes about the metrics:
 1)data preparation: under directory "/home/jinjing/Projects/data_old/new_data/output/idx_video_frame/"  saved all the paired of frames we want to manul lable GT_H_mat.    The name of the pair of imgs should be: pairIdx_videoSrc_frameIdx.  pairIdx is the identity for each different pair, i.e videoSrc/frameIdx can be same under the directory.
 2)annotator_main.py: this script will assist up to manually generate GT_H_Mat. Remember to keep consistent, we chose 4 pairs of points for each pair of successive img. (at least 4 pairs of pts can compute decent H_mat; if we want, we can also choose more pairs, while remember to change some code in following evaluators)
 3)accrose all the different feature points methods, we have the other version of evaluator for each. Spercifically, they will be run with the "main2()"  entrance, and the called function are named with original_evalutate_func_name2().
-In generall, the procedure are quite similiar as normal ones, but we only consider the detected features within polygon(formed with the chosen 4 pair of points), this function is supported by python package shapely.![trian2](https://user-images.githubusercontent.com/57319627/142914558-10e8b537-63ca-44c2-8665-7ad0eda01b35.png)
+In generall, the procedure are quite similiar as normal ones, but we only consider the detected features within polygon(formed with the chosen 4 pair of points), this function is supported by python package shapely.
+
+## test the shapely function, we consider triangle shape for example with KP2D kpts
+![trian2](https://user-images.githubusercontent.com/57319627/142914558-10e8b537-63ca-44c2-8665-7ad0eda01b35.png)
 ![rect1](https://user-images.githubusercontent.com/57319627/142914561-b475f2a6-0849-4a64-9af2-46eafea5a7cb.png)
+
+FINAL:
+
+eg: ORB   within rectangle
 ![3_22_4 png_ORB](https://user-images.githubusercontent.com/57319627/142914887-2de28588-a121-4f0b-a1f5-b69ed88b2d07.png)
+eg: AKAZE  within rectangle
 ![3_22_4 png_AKAZE](https://user-images.githubusercontent.com/57319627/142914890-669721d7-bc94-4d11-a555-0b8d07ac5233.png)
 
 
