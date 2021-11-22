@@ -290,6 +290,7 @@ def compute_homography(data, keep_k_points=1000):
     warped_corners = warped_corners[:, :2] / warped_corners[:, 2:]
     
     mean_dist = np.mean(np.linalg.norm(real_warped_corners - warped_corners, axis=1))
+    # print("mean_dist:",mean_dist)
     correctness1 = float(mean_dist <= 1)
     correctness3 = float(mean_dist <= 3)
     correctness5 = float(mean_dist <= 5)

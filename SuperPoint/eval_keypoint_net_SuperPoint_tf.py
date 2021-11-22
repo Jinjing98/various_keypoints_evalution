@@ -16,7 +16,8 @@ import numpy as np
 import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
 
-from superpoint.evaluations.evaluate import evaluate_keypoint_net_SP
+
+from superpoint.evaluations.evaluate import evaluate_keypoint_net_SP,evaluate_keypoint_net_SP2
 
 from match_features_demo import  extract_superpoint_keypoints_and_descriptors, preprocess_image
 
@@ -115,8 +116,68 @@ def main():
                 print('MScore {:.3f}'.format(mscore))
 
 
+
+def main2():
+
+
+    ori_img_dir = "/home/jinjing/Projects/data/ori_imgs/"
+    # ori_img_paths = os.listdir(ori_img_dir)
+
+    warp_img_dir = "/home/jinjing/Projects/data/out_imgs/"
+    final_ori_img_dir = "/home/jinjing/Projects/data/final_ori_imgs/"
+    warp_img_dir = "/home/jinjing/Projects/data_old/new_data/output/paired_opt/"#idx_video_frame
+    final_ori_img_dir = "/home/jinjing/Projects/data_old/new_data/output/idx_video_frame/"
+
+    EXPER_PATH="/home/jinjing/Projects/keypoints_comparision/pretrained_models"
+
+    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description='Compute the homography \
+            between two images with the SuperPoint feature matches.')
+    parser.add_argument('--k_best', type=int, default=200,
+                        help='Maximum number of keypoints to keep \
+                        (default: 1000)')
+    args = parser.parse_args()
+
+    weights_name = "sp_v6"#args.weights_name""
+    keep_k_best = args.k_best
+
+    weights_root_dir = Path(EXPER_PATH, 'saved_models')
+    weights_root_dir.mkdir(parents=True, exist_ok=True)
+    weights_dir = Path(weights_root_dir, weights_name)
+
+    graph = tf.Graph()
+    with tf.Session(graph=graph) as sess:
+        tf.saved_model.loader.load(sess,
+                                   [tf.saved_model.tag_constants.SERVING],#r"E:\Google Drive\\files.sem3\NCT\Reuben_lab\keypoint_detector_descriptor_evaluator-main\models\SuperPoint\pretrained_models\sp_v6.tar")
+                                   str(weights_dir))
+
+        input_img_tensor = graph.get_tensor_by_name('superpoint/image:0')
+        output_prob_nms_tensor = graph.get_tensor_by_name(
+            'superpoint/prob_nms:0')
+        output_desc_tensors = graph.get_tensor_by_name(
+            'superpoint/descriptors:0')
+
+
+        conf_trd_sets = [0]
+        top_k_points = [50,100,200,300]
+        for confidence in conf_trd_sets:
+            for k in top_k_points:
+
+                rep, loc, c1, c3, c5, mscore = evaluate_keypoint_net_SP2(final_ori_img_dir,warp_img_dir,sess,k,input_img_tensor,
+                                         output_prob_nms_tensor,output_desc_tensors,confidence )
+                print(colored('Evaluating for super point: confidence {} k_points {}'.format(confidence,k),'green'))
+                print('Repeatability {0:.3f}'.format(rep))
+                print('Localization Error {0:.3f}'.format(loc))
+                print('Correctness d1 {:.3f}'.format(c1))
+                print('Correctness d3 {:.3f}'.format(c3))
+                print('Correctness d5 {:.3f}'.format(c5))
+                print('MScore {:.3f}'.format(mscore))
+
+
+
 if __name__ == '__main__':
-    main()
+    # main()
+    main2()
 
 
 

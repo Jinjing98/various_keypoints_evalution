@@ -80,9 +80,9 @@ def compute_repeatability(data, keep_k_points=300, distance_thresh=3):
 
     keypoints = np.stack([keypoints[0], keypoints[1]], axis=-1)
     warped_keypoints = np.stack([warped_keypoints[0], warped_keypoints[1], warped_prob], axis=-1)
-    # print("debug:",keypoints.shape, warped_keypoints.shape)
+    # print("debug1:",keypoints.shape, warped_keypoints.shape)
     warped_keypoints = keep_true_keypoints(warped_keypoints, np.linalg.inv(H), shape)
-    # print("debug:",warped_keypoints.shape)
+    # print("debug2:",warped_keypoints.shape)
 
     # Warp the original keypoints with the true homography
     true_warped_keypoints = warp_keypoints(keypoints[:, [1, 0]], H)
@@ -99,10 +99,12 @@ def compute_repeatability(data, keep_k_points=300, distance_thresh=3):
     # Compute the repeatability
     N1 = true_warped_keypoints.shape[0]
     N2 = warped_keypoints.shape[0]
+    print(N1,N2)
     true_warped_keypoints = np.expand_dims(true_warped_keypoints, 1)
     warped_keypoints = np.expand_dims(warped_keypoints, 0)
     # shapes are broadcasted to N1 x N2 x 2:
     norm = np.linalg.norm(true_warped_keypoints - warped_keypoints, ord=None, axis=2)
+    # print(norm.shape)
     count1 = 0
     count2 = 0
     le1 = 0

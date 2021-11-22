@@ -153,6 +153,9 @@ def compute_matching_score(real_H,shape,keypoints,warped_keypoints,desc,warped_d
 
     if (desc is None) or (warped_desc is None):
         return 0
+    if desc.shape[0]==0 or warped_desc.shape[0]==0:
+        return 0
+
 
     # shape = data['image_shape']
     # real_H = data['homography']
