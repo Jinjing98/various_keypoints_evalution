@@ -44,11 +44,12 @@ In generall, the procedure are quite similiar as normal ones, but we only consid
 ![trian2](https://user-images.githubusercontent.com/57319627/142914558-10e8b537-63ca-44c2-8665-7ad0eda01b35.png)
 ![rect1](https://user-images.githubusercontent.com/57319627/142914561-b475f2a6-0849-4a64-9af2-46eafea5a7cb.png)
 
-FINAL:
+##FINAL:
 
-eg: ORB   within rectangle
+##eg: ORB   within rectangle
 ![3_22_4 png_ORB](https://user-images.githubusercontent.com/57319627/142914887-2de28588-a121-4f0b-a1f5-b69ed88b2d07.png)
-eg: AKAZE  within rectangle
+
+##eg: AKAZE  within rectangle
 ![3_22_4 png_AKAZE](https://user-images.githubusercontent.com/57319627/142914890-669721d7-bc94-4d11-a555-0b8d07ac5233.png)
 
 
