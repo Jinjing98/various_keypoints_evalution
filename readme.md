@@ -40,7 +40,7 @@ some notes about the metrics:
 3)accrose all the different feature points methods, we have the other version of evaluator for each. Spercifically, they will be run with the "main2()"  entrance, and the called function are named with original_evalutate_func_name2().
 In generall, the procedure are quite similiar as normal ones, but we only consider the detected features within polygon(formed with the chosen 4 pair of points), this function is supported by python package shapely.
 
-## test the shapely function, we consider triangle shape for example with KP2D kpts
+## test the shapely function, we consider triangle/rectangle shape for example with KP2D kpts
 ![trian2](https://user-images.githubusercontent.com/57319627/142914558-10e8b537-63ca-44c2-8665-7ad0eda01b35.png)
 ![rect1](https://user-images.githubusercontent.com/57319627/142914561-b475f2a6-0849-4a64-9af2-46eafea5a7cb.png)
 
